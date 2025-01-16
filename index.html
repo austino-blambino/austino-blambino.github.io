@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Terminal</title>
+    <style>
+      .output {
+        height: 92%;
+        width: 100%;
+        padding: 0px;
+        white-space: pre-wrap;
+      }
+      .input {
+        height: 16px;
+        padding: 0px;
+        width: 85%;
+        transform: translateX(30px);
+      }
+      
+      .format {
+        outline: none;
+        border: none;
+        resize: none;
+        margin: right;
+        overflow-y: auto;
+        overflow-wrap: break-word;
+        display: flex;
+        flex-direction: column-reverse;
+        background-color: black;
+      }
+      .font {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 16px;
+        color: white;
+      }
+      .prompt {
+        transform: translateY(16px);
+        list-style: none;
+        text-decoration: none;
+        box-sizing: content-box;
+        padding: 0px;
+        margin: 0px;
+      }
+      body {
+        background-color: darkgrey;
+      }
+      .hidden-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .terminal {
+        background-color: black;
+        padding: 2%;
+        margin: 0%;
+        width: 96%;
+        height: 93%;
+        position: absolute;
+        bottom: 0;
+      }
+      .line{
+        display: table;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body style="padding: 0px; margin: 0px;">
+
+    <div class="terminal">
+      <span id="output" class="format font output hidden-scrollbar"></span>
+      <p id="prompt" class="format font prompt">>> </p>
+      <form id="inputForm">
+        <input id="input" class="format font input" autofocus disabled></input>
+        <script>
+          document.getElementById("inputForm").addEventListener('submit', function(event) {
+            event.preventDefault();
+            // checkInput(inputText);
+          });
+
+          document.addEventListener('keypress', function(event) {
+            if (event.key == 'Enter') {
+              const inputText = document.getElementById("input").value;
+              checkInput(inputText);
+            }
+          });
+        </script>
+      </form>
+      <script src="main.js"></script>
+    </div>
+  </body>
+</html>
