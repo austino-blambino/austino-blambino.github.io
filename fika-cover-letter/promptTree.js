@@ -41,17 +41,32 @@ class PromptTree {
         if (this.awaitingEnter) {
             exitAwaitingEnterLoop();
         } else if (input != "") {
+            input = input.toLowerCase().replace(/\s+/g, " ").trim();
+            
             var childPrompt = this.getCurrentPrompt().getChildPrompt(input);
+            
+            if (childPrompt == null) {
+                input = this.getCurrentPrompt().guessInput(input);
+                
+                if (input != null) {
+                    childPrompt = this.getCurrentPrompt().getChildPrompt(input);
+                }
+            }
+            
             var promptPointer = null;
             var showText = true;
+            
             if (childPrompt instanceof PromptPointer) {
                 promptPointer = childPrompt;
                 childPrompt = promptPointer.getPromptFromPointer();
+                
                 if (childPrompt == null) {
                     throw new TypeError("Could not find prompt with ID " + promptPointer.getId());
                 }
+                
                 showText = promptPointer.getShowNextText();
             }
+            
             if (childPrompt != null) {
                 if (!this.previousInputValid) {
                     erasePreviousInvalidInput();
@@ -59,19 +74,24 @@ class PromptTree {
                 } else {
                     await validInput(input, true);
                 }
+                
                 this.previousInputValid = true;
+                
                 if (promptPointer != null) {
                     await promptPointer.runTextFunction();
                 }
                 childPrompt.runFunctions(showText);
+                
                 this.setCurrentPrompt(childPrompt);
-            } else {
+            } 
+            else {
                 if (!this.previousInputValid) {
                     erasePreviousInvalidInput();
                     await invalidInput(false);
                 } else {
                     await invalidInput(true);
                 }
+                
                 this.previousInputValid = false;
             }
         }

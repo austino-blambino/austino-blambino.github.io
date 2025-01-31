@@ -46,13 +46,51 @@ class Prompt {
     getId() {
         return this.id;
     }
-
-    getChildPrompt(answer) {
-        if (this.answerMap.has(answer)) {
-            return this.answerMap.get(answer);
+    
+    getChildPrompt(input) {
+        if (this.answerMap.has(input)) {
+            return this.answerMap.get(input);
         } else {
             return null;
         }
+    }
+
+    guessInput(input) {
+        var dlDist;
+        for (const key of this.answerMap.keys()) {
+            dlDist = this.getDLDist(input, key);
+            if (dlDist <= 2) {
+                return key; // All valid inputs are more than 4 edits apart
+            }
+        }
+        return null;
+    }
+
+    getDLDist(a, b) {
+        const lenA = a.length;
+        const lenB = b.length;
+        
+        const dp = Array.from({ length: lenA + 1 }, () => Array(lenB + 1).fill(0));
+        
+        for (let i = 0; i <= lenA; i++) dp[i][0] = i;
+        for (let j = 0; j <= lenB; j++) dp[0][j] = j;
+        
+        for (let i = 1; i <= lenA; i++) {
+            for (let j = 1; j <= lenB; j++) {
+                const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                
+                dp[i][j] = Math.min(
+                    dp[i - 1][j] + 1, // Deletion
+                    dp[i][j - 1] + 1, // Insertion
+                    dp[i - 1][j - 1] + cost // Substitution
+                );
+                if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+                    dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + cost); // Transposition
+                }
+            }
+        }
+        
+        return dp[lenA][lenB];
     }
 
 }
